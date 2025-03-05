@@ -45,6 +45,8 @@ public class Unit : MonoBehaviour
         }
         unitManager.map[pos.x, pos.y].currentUnit = this;
 
+        Debug.Log($"{pos.x}{pos.y}");
+
         GameManager.Instance.TurnChange();
     }
     public virtual bool Check_Illegalmove(Coord coord)
@@ -79,6 +81,7 @@ public class Unit : MonoBehaviour
                 break;
             }
         }
+        gameObject.layer = 0;
     }
     public virtual List<Node> GetMovableNode()
     {

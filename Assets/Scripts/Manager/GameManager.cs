@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,6 +13,11 @@ public class GameManager : MonoBehaviour
 
     public bool isOnPromotion = false;
 
+    public GameObject nodePrefab;
+    public float nodeSize;
+    public float nodeHeight;
+    public Vector3 node_startPos;
+
     private void Awake()
     {
         if(instance == null)
@@ -25,12 +29,13 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        GetMap();
+        CreateMap();
     }
-    private void Start()
+    private void Update()
     {
 
     }
+    
     public void TurnChange()
     {
         if (turnPlayer == UnitColor.White)
@@ -350,13 +355,17 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    void GetMap()
+    void CreateMap()
     {
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                map[i, j] = terrain.GetChild(j * 8 + i).GetComponent<Node>();
+                GameObject node = Instantiate(nodePrefab);
+                node.transform.parent = terrain;
+                node.transform.localPosition = node_startPos + (new Vector3(-j, 0, i) * nodeSize);
+                node.name = $"{Convert.ToChar(i + 'A')}{j + 1}";
+                map[i, j] = node.GetComponent<Node>();
                 map[i, j].pos = new Coord(i, j);
             }
         }

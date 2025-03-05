@@ -26,6 +26,7 @@ public class PlayerControl : MonoBehaviour
                 selectedUnit.transform.position = new Vector3(mousePoint.x, mousePoint.y, mousePoint.z);
             }
         }
+
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {    
             if (selectedUnit == null)
