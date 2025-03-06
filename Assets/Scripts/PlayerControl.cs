@@ -33,7 +33,10 @@ public class PlayerControl : MonoBehaviour
             {
                 SelectUnit();
             }
-            else
+        }
+        if (Input.GetKeyUp(KeyCode.Mouse0))
+        {
+            if(selectedUnit != null)
             {
                 MoveUnit();
             }

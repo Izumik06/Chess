@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    RecordManager recordManager;
+
     public UnitType unitType;
     public UnitColor unitColor;
     public UnitManager unitManager;
@@ -13,7 +15,7 @@ public class Unit : MonoBehaviour
 
     private void Start()
     {
-        if((int)unitType < 6)
+        if ((int)unitType < 6)
         {
             moveDir = 1;
             unitColor = UnitColor.White;
@@ -23,6 +25,7 @@ public class Unit : MonoBehaviour
             moveDir = -1;
             unitColor = UnitColor.Black;
         }
+        recordManager = GameObject.Find("RecordManager").GetComponent<RecordManager>();
     }
     public void ShowMovableNode()
     {
@@ -34,19 +37,20 @@ public class Unit : MonoBehaviour
     }
     public virtual void MoveUnit(Coord pos)
     {
+        Coord beforePos = currentPos;
+        bool isKillUnit = unitManager.map[pos.x, pos.y].currentUnit != null;
         unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
 
         currentPos = pos;
-        transform.position = new Vector3(unitManager.map[pos.x, pos.y].transform.position.x, 14, unitManager.map[pos.x, pos.y].transform.position.z) ;
+        transform.position = new Vector3(unitManager.map[pos.x, pos.y].transform.position.x, 14, unitManager.map[pos.x, pos.y].transform.position.z);
 
-        if(unitManager.map[pos.x, pos.y].currentUnit != null)
+        if (unitManager.map[pos.x, pos.y].currentUnit != null)
         {
             unitManager.map[pos.x, pos.y].currentUnit.DestroyObject();
         }
         unitManager.map[pos.x, pos.y].currentUnit = this;
 
-        Debug.Log($"{pos.x}{pos.y}");
-
+        recordManager.records.Add(new Record(unitType, beforePos, pos, isKillUnit));
         GameManager.Instance.TurnChange();
     }
     public virtual bool Check_Illegalmove(Coord coord)
@@ -72,7 +76,7 @@ public class Unit : MonoBehaviour
     {
         unitManager.units[(int)unitColor].Remove(this);
         unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
-        for(int i = 0; i < 16; i++)
+        for (int i = 0; i < 16; i++)
         {
             if (unitManager.unitCemetery[(int)unitColor][i].currentUnit == null)
             {
@@ -101,7 +105,7 @@ public class Coord
     }
     public bool IsOverBoard()
     {
-        if(x > 7 || x < 0 || y > 7 || y < 0)
+        if (x > 7 || x < 0 || y > 7 || y < 0)
         {
             return true;
         }
