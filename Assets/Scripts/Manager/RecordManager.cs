@@ -44,7 +44,7 @@ public class Record
                 }
                 recordText += $"{Convert.ToChar(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
                 break;
-            case "Kinght":
+            case "Knight":
                 recordText += "N";
 
                 List<Coord> movableCoords = new List<Coord>() { new Coord(1, 2), new Coord(1, -2), new Coord(2, 1), new Coord(2, -1), new Coord(-1, 2), new Coord(-1, -2), new Coord(-2, 1), new Coord(-2, -1)};
@@ -63,26 +63,27 @@ public class Record
                         }
                     }
                 }
-                movableCoords = movableCoords.Where(_ => _ == beforeCoord).ToList();
 
 
-                if(movableCoords.Count != 0) {
-                    List<Coord> checkList = movableCoords.Where(_ => _.y == beforeCoord.y).ToList();
+                if(overlapCoords.Count != 0) {
+                    List<Coord> checkList = overlapCoords.Where(_ => _.y == beforeCoord.y).ToList();
 
-
-                    if (checkList.Count >= 0)
+                    bool isAddtext = false;
+                    if (checkList.Count > 0)
                     {
+                        isAddtext = true;
                         recordText += Convert.ToChar(beforeCoord.x + (int)'a');
                     }
-                    checkList = movableCoords.Where(_ => _ == beforeCoord && _.x == beforeCoord.x).ToList();
-                    if (checkList.Count >= 0)
+                    checkList = overlapCoords.Where(_ => _ == beforeCoord && _.x == beforeCoord.x).ToList();
+                    if (checkList.Count > 0)
                     {
+                        isAddtext = true;
                         recordText += beforeCoord.y + 1;
                     }
 
-                    if(recordText == "R")
+                    if(!isAddtext)
                     {
-                        recordText += beforeCoord.y + 1;
+                        recordText += Convert.ToChar(beforeCoord.x + (int)'a');
                     }
                 }
 
