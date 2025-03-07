@@ -31,7 +31,7 @@ public class Record
     {
         color = (UnitColor)Enum.Parse(typeof(UnitColor), unitType.ToString().Substring(0, 5));
 
-        recordText = Mathf.Floor((GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count + 2) / 2) + (unitType.ToString().Contains("Black") ? "..." : ".");
+        recordText = Mathf.Floor((GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count + 2) / 2) + (color == UnitColor.Black ? "..." : ".");
 
         string unittype = unitType.ToString().Substring(5);
 
@@ -42,7 +42,6 @@ public class Record
                 {
                     recordText += Convert.ToChar(beforeCoord.x + (int)'a') + "x";
                 }
-                recordText += $"{Convert.ToChar(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
                 break;
             case "Knight":
                 recordText += "N";
@@ -54,9 +53,9 @@ public class Record
                     Coord checkCoord = movableCoords[i] + afterCoord;
                     if (!checkCoord.IsOverBoard())
                     {
-                        if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null && GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitColor == color)
+                        if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null)
                         {
-                            if(GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Knight"))
+                            if(GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType == unitType)
                             {
                                 overlapCoords.Add(checkCoord);
                             }
@@ -65,7 +64,8 @@ public class Record
                 }
 
 
-                if(overlapCoords.Count != 0) {
+                if (overlapCoords.Count != 0)
+                {
                     List<Coord> checkList = overlapCoords.Where(_ => _.y == beforeCoord.y).ToList();
 
                     bool isAddtext = false;
@@ -74,21 +74,18 @@ public class Record
                         isAddtext = true;
                         recordText += Convert.ToChar(beforeCoord.x + (int)'a');
                     }
-                    checkList = overlapCoords.Where(_ => _ == beforeCoord && _.x == beforeCoord.x).ToList();
+                    checkList = overlapCoords.Where(_ => _.x == beforeCoord.x).ToList();
                     if (checkList.Count > 0)
                     {
                         isAddtext = true;
                         recordText += beforeCoord.y + 1;
                     }
 
-                    if(!isAddtext)
+                    if (!isAddtext)
                     {
                         recordText += Convert.ToChar(beforeCoord.x + (int)'a');
                     }
                 }
-
-
-                recordText += $"{Convert.ToChar(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
                 break;
             case "Rook":
                 recordText += "R";
@@ -103,7 +100,7 @@ public class Record
                         {
                             if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null)
                             {
-                                if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitColor == color && GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Rook"))
+                                if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType == unitType)
                                 {
                                     Debug.Log($"{checkCoord.x}{checkCoord.y}");
                                     recordText += Convert.ToChar(beforeCoord.x + (int)'a');
@@ -129,7 +126,7 @@ ExitRoop1:
                         {
                             if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null)
                             {
-                                if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitColor == color && GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Rook"))
+                                if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType == unitType)
                                 {
                                     recordText += beforeCoord.y + 1;
                                     goto ExitRoop2;
@@ -144,32 +141,85 @@ ExitRoop1:
                     }
                 }
 ExitRoop2:
-                recordText += $"{Convert.ToChar(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
                 break;
             case "Bishop":
-                recordText = "B";
+                recordText += "B";
+                List<Coord> overlapCoord = new List<Coord>();
+                for (int i = -1; i < 2; i += 2)
+                {
+                    for (int j = 1; j < 8; j++)
+                    {
+                        Coord checkCoord = new Coord(afterCoord.x + j, afterCoord.y + j * i);
 
-                recordText += $"{(char)(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
+                        if (checkCoord.IsOverBoard()) { break; }
+                        if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null)
+                        {
+                            if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null && GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType == unitType)
+                            {
+                                overlapCoord.Add(checkCoord);
+                            }
+                        }
+                    }
+                }
+                for (int i = -1; i < 2; i += 2)
+                {
+                    for (int j = -1; j > -8; j--)
+                    {
+                        Coord checkCoord = new Coord(afterCoord.x + j, afterCoord.y + j * i);
+
+                        if (checkCoord.IsOverBoard()) { break; }
+                        if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null)
+                        {
+                            if (GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit != null && GameManager.Instance.map[checkCoord.x, checkCoord.y].currentUnit.unitType == unitType)
+                            {
+                                overlapCoord.Add(checkCoord);
+                            }
+                        }
+                    }
+                }
+                if (overlapCoord.Count != 0)
+                {
+                    List<Coord> checkList = overlapCoord.Where(_ => _.y == beforeCoord.y).ToList();
+
+                    bool isAddtext = false;
+                    if (checkList.Count > 0)
+                    {
+                        isAddtext = true;
+                        recordText += Convert.ToChar(beforeCoord.x + (int)'a');
+                    }
+                    checkList = overlapCoord.Where(_ => _.x == beforeCoord.x).ToList();
+                    if (checkList.Count > 0)
+                    {
+                        isAddtext = true;
+                        recordText += beforeCoord.y + 1;
+                    }
+
+                    if (!isAddtext)
+                    {
+                        recordText += Convert.ToChar(beforeCoord.x + (int)'a');
+                    }
+                }
                 break;
             case "Queen":
                 break;
             case "King":
                 break;
         }
-
-        if (unitType.ToString().Contains("Pawn"))
+        if (unittype != "Pawn")
         {
+            if (isKillUnit)
+            {
+                recordText += "x";
+            }
+        }
+        recordText += $"{(char)(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
 
-        }
-        if (isKillUnit && unittype != "Pawn")
-        {
-            recordText.Insert(1, "x");
-        }
-        Debug.Log(recordText);
+
     }
     public Record(UnitColor color, string recordText)
     {
         this.color = color;
-        this.recordText = recordText;
+        this.recordText = Mathf.Floor((GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count + 2) / 2) + (color == UnitColor.Black ? "..." : ".");
+        this.recordText += recordText;
     }   
 }

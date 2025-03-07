@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //선택된 기물을 마우스 위치로 이동
         if(selectedUnit != null)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -42,6 +44,9 @@ public class PlayerControl : MonoBehaviour
             }
         }
     }
+    /// <summary>
+    /// 마우스 위치에 있는 기물을 선택
+    /// </summary>
     void SelectUnit()
     {
         if (GameManager.Instance.isOnPromotion) { return; }
@@ -59,6 +64,9 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 선택된 기물을 마우스 위치에 있는 노드로 이동
+    /// </summary>
     void MoveUnit()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -66,10 +74,15 @@ public class PlayerControl : MonoBehaviour
         if(Physics.Raycast(ray, out hit, Mathf.Infinity, nodeLayer))
         {
             GameManager.Instance.ClearNode();
-            selectedUnit.GetComponent<Collider>().isTrigger = false;
-            selectedUnit.MoveUnit(hit.transform.GetComponent<Node>().pos);
+
+            //이동 후에도 update에 있는 마우스 위치 이동코드로 인해 잘못된 위치로 가는 상황 예방
+            Unit unit = selectedUnit;
             selectedUnit = null;
+
+            unit.GetComponent<Collider>().isTrigger = false;
+            unit.MoveUnit(hit.transform.GetComponent<Node>().pos);
         }
+        //마우스의 위치에 활성화된 칸이 없을 시 원래 위치로 이동
         else
         {
             selectedUnit.transform.position = new Vector3(GameManager.Instance.map[(int)selectedUnit.currentPos.x, (int)selectedUnit.currentPos.y].transform.position.x, 14, GameManager.Instance.map[(int)selectedUnit.currentPos.x, (int)selectedUnit.currentPos.y].transform.position.z);

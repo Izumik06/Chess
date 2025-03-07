@@ -102,15 +102,20 @@ public class King : Unit
     }
     public override void MoveUnit(Coord pos)
     {
+        //castling
         if (!isMoved && Coord.Distance(pos, currentPos) > 1.9f)
         {
+            //O-O
             if (pos == new Coord(6, currentPos.y))
             {
                 unitManager.map[7, currentPos.y].currentUnit.MoveUnit(new Coord(5, currentPos.y));
+                recordManager.records.Add(new Record(unitColor, "O-O"));
             }
+            //O-O
             else
             {
                 unitManager.map[0, currentPos.y].currentUnit.MoveUnit(new Coord(3, currentPos.y));
+                recordManager.records.Add(new Record(unitColor, "O-O-O"));
             }
 
             unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
@@ -118,10 +123,6 @@ public class King : Unit
             currentPos = pos;
             transform.position = new Vector3(unitManager.map[pos.x, pos.y].transform.position.x, 14, unitManager.map[pos.x, pos.y].transform.position.z);
 
-            if (unitManager.map[pos.x, pos.y].currentUnit != null)
-            {
-                unitManager.map[pos.x, pos.y].currentUnit.DestroyObject();
-            }
             unitManager.map[pos.x, pos.y].currentUnit = this;
         }
         else

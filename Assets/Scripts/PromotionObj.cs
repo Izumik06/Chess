@@ -22,6 +22,16 @@ public class PromotionObj : MonoBehaviour
             Pawn pawn = (Pawn)unitManager.units[(int)color].Where(_ => _.currentPos.y == 0 && _.unitType == UnitType.BlackPawn).ToList()[0];
             pawn.Promotion(unitType);
         }
+        char promotionInitial;
+        if (unitType.ToString().Contains("Knight"))
+        {
+            promotionInitial = 'N';
+        }
+        else
+        {
+            promotionInitial = unitType.ToString()[5];
+        }
+        GameObject.Find("RecordManager").GetComponent<RecordManager>().records[GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count - 1].recordText += "=" + promotionInitial;
         transform.parent.gameObject.SetActive(false);
     }
 }

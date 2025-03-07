@@ -9,13 +9,14 @@ public class Bishop : Unit
     {
         List<Node> movableNodes = new List<Node>();
 
-        for(int i = 1, j = 1; i < 8; i++, j++)
+        // ↗ 검사
+        for (int i = 1, j = 1; i < 8; i++, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
             if (pos.IsOverBoard()) { break; }
             if (unitManager.map[pos.x, pos.y].currentUnit != null)
             {
-                if(unitManager.map[pos.x, pos.y].currentUnit.unitColor != unitColor)
+                if (unitManager.map[pos.x, pos.y].currentUnit.unitColor != unitColor)
                 {
                     movableNodes.Add(unitManager.map[pos.x, pos.y]);
                 }
@@ -26,6 +27,8 @@ public class Bishop : Unit
                 movableNodes.Add(unitManager.map[pos.x, pos.y]);
             }
         }
+
+        // ↘ 검사
         for (int i = 1, j = -1; i < 8; i++, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -44,6 +47,8 @@ public class Bishop : Unit
                 movableNodes.Add(unitManager.map[pos.x, pos.y]);
             }
         }
+
+        // ↙ 검사
         for (int i = -1, j = -1; i > -8; i--, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -61,6 +66,8 @@ public class Bishop : Unit
                 movableNodes.Add(unitManager.map[pos.x, pos.y]);
             }
         }
+
+        // ↖ 검사
         for (int i = -1, j = 1; i < 8; i--, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -78,6 +85,8 @@ public class Bishop : Unit
                 movableNodes.Add(unitManager.map[pos.x, pos.y]);
             }
         }
+
+        //금수 제거
         movableNodes = movableNodes.Where(_ => !Check_Illegalmove(_.pos)).ToList();
         return movableNodes;
     }

@@ -14,7 +14,8 @@ public class Pawn : Unit
     public override List<Node> GetMovableNode()
     {
         List<Node> movableNodes = new List<Node>();
-       
+        
+        //잡을 수 있는 기물이 있는지 확인
         if(currentPos.x != 7)
         {
             if (unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir].currentUnit != null && unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir].currentUnit.unitColor != unitColor)
@@ -30,6 +31,7 @@ public class Pawn : Unit
             }
         }
 
+        //2칸 이동 가능한지 확인
         if(unitManager.map[currentPos.x, currentPos.y + 1 * moveDir].currentUnit == null)
         {
             movableNodes.Add(unitManager.map[currentPos.x, currentPos.y + 1 * moveDir]);
@@ -74,8 +76,11 @@ public class Pawn : Unit
         //Promotion
         if((unitColor == UnitColor.White && pos.y == 7) || (unitColor == UnitColor.Black && pos.y == 0))
         {
-            //이동
+            //이동(프로모션을 하기 전까지 턴이 넘어가면 안됨)
             unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
+
+            //기보 저장
+            recordManager.records.Add(new Record(unitType, currentPos, pos, unitManager.map[pos.x, pos.y].currentUnit != null));
 
             currentPos = pos;
             transform.position = new Vector3(unitManager.map[pos.x, pos.y].transform.position.x, 14, unitManager.map[pos.x, pos.y].transform.position.z);
@@ -95,6 +100,9 @@ public class Pawn : Unit
 
         isMoved = true;
     }
+    /// <summary>
+    /// type에 있는 기물을 생성 후 자신을 파괴
+    /// </summary>
     public void Promotion(UnitType type)
     {
         GameObject unit = Instantiate(unitManager.unitPrefabs[(int)type]);
@@ -111,6 +119,9 @@ public class Pawn : Unit
         GameManager.Instance.isOnPromotion = false; 
         Destroy(gameObject);
     }
+    /// <summary>
+    /// 프로모션 오브젝트를 자신 앞에 생성
+    /// </summary>
     void SetPromotionObj()
     {
         GameManager.Instance.isOnPromotion = true;
