@@ -24,14 +24,13 @@ public class RecordManager : MonoBehaviour
 [Serializable]
 public class Record
 {
-    UnitColor color;
+    public UnitColor color;
     public string recordText;
 
     public Record(UnitType unitType, Coord beforeCoord, Coord afterCoord, bool isKillUnit)
     {
         color = (UnitColor)Enum.Parse(typeof(UnitColor), unitType.ToString().Substring(0, 5));
 
-        recordText = Mathf.Floor((GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count + 2) / 2) + (color == UnitColor.Black ? "..." : ".");
 
         string unittype = unitType.ToString().Substring(5);
 
@@ -219,7 +218,6 @@ ExitRoop2:
     public Record(UnitColor color, string recordText)
     {
         this.color = color;
-        this.recordText = Mathf.Floor((GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count + 2) / 2) + (color == UnitColor.Black ? "..." : ".");
         this.recordText += recordText;
     }   
 }

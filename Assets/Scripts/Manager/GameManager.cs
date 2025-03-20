@@ -1,6 +1,7 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -18,6 +19,11 @@ public class GameManager : MonoBehaviour
     public float nodeHeight;
     public Vector3 node_startPos;
 
+    UIManager uiManager;
+
+    public UnitColor player1Color;
+    public int player1Timer;
+    public int player2Timer;
     private void Awake()
     {
         if(instance == null)
@@ -31,9 +37,23 @@ public class GameManager : MonoBehaviour
         }
         CreateMap();
     }
-    private void Update()
+    private void Start()
     {
-
+        uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
+        StartCoroutine(UpdateTimer());
+    }
+    
+    IEnumerator UpdateTimer()
+    {
+        yield return new WaitForSeconds(1f);
+        if (turnPlayer == player1Color)
+        {
+            player1Timer -= 1;
+        }
+        else
+        {
+            player2Timer -= 1;
+        }
     }
     
     public void TurnChange()
@@ -54,6 +74,7 @@ public class GameManager : MonoBehaviour
                 ((Pawn)unitManager.units[(int)turnPlayer][i]).canEnpassant = false;
             }
         }
+        uiManager.SetRecord();
         if (Check_Mate())
         {
             if (Check_Check())

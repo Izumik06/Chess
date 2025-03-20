@@ -9,7 +9,7 @@ public class Bishop : Unit
     {
         List<Node> movableNodes = new List<Node>();
 
-        // ¢Ö °Ë»ç
+        // ï¿½ï¿½ ï¿½Ë»ï¿½
         for (int i = 1, j = 1; i < 8; i++, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -28,7 +28,7 @@ public class Bishop : Unit
             }
         }
 
-        // ¢Ù °Ë»ç
+        // ï¿½ï¿½ ï¿½Ë»ï¿½
         for (int i = 1, j = -1; i < 8; i++, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -48,7 +48,7 @@ public class Bishop : Unit
             }
         }
 
-        // ¢× °Ë»ç
+        // ï¿½ï¿½ ï¿½Ë»ï¿½
         for (int i = -1, j = -1; i > -8; i--, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -67,7 +67,7 @@ public class Bishop : Unit
             }
         }
 
-        // ¢Ø °Ë»ç
+        // ï¿½ï¿½ ï¿½Ë»ï¿½
         for (int i = -1, j = 1; i < 8; i--, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -86,8 +86,11 @@ public class Bishop : Unit
             }
         }
 
-        //±Ý¼ö Á¦°Å
+        //ï¿½Ý¼ï¿½ ï¿½ï¿½ï¿½ï¿½
         movableNodes = movableNodes.Where(_ => !Check_Illegalmove(_.pos)).ToList();
         return movableNodes;
+    }
+    void asdf(){
+        
     }
 }
