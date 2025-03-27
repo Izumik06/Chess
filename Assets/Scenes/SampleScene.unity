@@ -2042,7 +2042,7 @@ GameObject:
   - component: {fileID: 788310665}
   - component: {fileID: 788310664}
   m_Layer: 5
-  m_Name: TImer
+  m_Name: Timer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2847,8 +2847,8 @@ MonoBehaviour:
   recordColor:
   - {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
   - {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
-  player1Timer: {fileID: 0}
-  player2Timer: {fileID: 0}
+  player1Timer: {fileID: 1840551865}
+  player2Timer: {fileID: 50589899}
 --- !u!4 &1077220073
 Transform:
   m_ObjectHideFlags: 0
@@ -4234,8 +4234,8 @@ MonoBehaviour:
   nodeHeight: 0
   node_startPos: {x: 5.25, y: -0.24, z: -5.25}
   player1Color: 0
-  player1Timer: 0
-  player2Timer: 0
+  player1Timer: 600
+  player2Timer: 600
 --- !u!4 &1648469055
 Transform:
   m_ObjectHideFlags: 0

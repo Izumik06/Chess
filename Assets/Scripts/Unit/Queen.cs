@@ -9,7 +9,7 @@ public class Queen : Unit
     {
         List<Node> movableNodes = new List<Node>();
 
-        // ¢Ö °Ë»ç
+        // â†— ê²€ì‚¬
         for (int i = 1, j = 1; i < 8; i++, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -28,7 +28,7 @@ public class Queen : Unit
             }
         }
 
-        // ¢Ù °Ë»ç
+        // â†˜ ê²€ì‚¬
         for (int i = 1, j = -1; i < 8; i++, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -48,7 +48,7 @@ public class Queen : Unit
             }
         }
 
-        // ¢× °Ë»ç
+        // â†™ ê²€ì‚¬
         for (int i = -1, j = -1; i > -8; i--, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -67,7 +67,7 @@ public class Queen : Unit
             }
         }
 
-        // ¢Ø °Ë»ç
+        // â†– ê²€ì‚¬
         for (int i = -1, j = 1; i < 8; i--, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -86,7 +86,7 @@ public class Queen : Unit
             }
         }
 
-        //ÁÂ ¿ì °Ë»ç
+        //ì¢Œ ìš° ê²€ì‚¬
         for (int j = -1; j < 2; j += 2)
         {
             for (int i = 1; i < 8; i++)
@@ -108,7 +108,7 @@ public class Queen : Unit
             }
         }
 
-        //»ó ÇÏ °Ë»ç
+        //ìƒ í•˜ ê²€ì‚¬
         for (int j = -1; j < 2; j += 2)
         {
             for (int i = 1; i < 8; i++)
@@ -130,7 +130,7 @@ public class Queen : Unit
             }
         }
 
-        //±Ý¼ö Á¦°Å
+        //ê¸ˆìˆ˜ ì œê±°
         movableNodes = movableNodes.Where(_ => !Check_Illegalmove(_.pos)).ToList();
         return movableNodes;
     }

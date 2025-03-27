@@ -10,20 +10,20 @@ public class Pawn : Unit
     public Transform blackPromotionObj;
 
     public bool canEnpassant = false;
-    bool isMoved = false;                                                                                                               
+    bool isMoved = false;
     public override List<Node> GetMovableNode()
     {
         List<Node> movableNodes = new List<Node>();
-        
-        //ÀâÀ» ¼ö ÀÖ´Â ±â¹°ÀÌ ÀÖ´ÂÁö È®ÀÎ
-        if(currentPos.x != 7)
+
+        //ì¡ì„ ìˆ˜ ìˆëŠ” ê¸°ë¬¼ì´ ìˆëŠ”ì§€ í™•ì¸
+        if (currentPos.x != 7)
         {
             if (unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir].currentUnit != null && unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir].currentUnit.unitColor != unitColor)
             {
                 movableNodes.Add(unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir]);
             }
         }
-        if(currentPos.x != 0)
+        if (currentPos.x != 0)
         {
             if (unitManager.map[currentPos.x - 1, currentPos.y + 1 * moveDir].currentUnit != null && unitManager.map[currentPos.x - 1, currentPos.y + 1 * moveDir].currentUnit.unitColor != unitColor)
             {
@@ -31,8 +31,8 @@ public class Pawn : Unit
             }
         }
 
-        //2Ä­ ÀÌµ¿ °¡´ÉÇÑÁö È®ÀÎ
-        if(unitManager.map[currentPos.x, currentPos.y + 1 * moveDir].currentUnit == null)
+        //2ì¹¸ ì´ë™ ê°€ëŠ¥í•œì§€ í™•ì¸
+        if (unitManager.map[currentPos.x, currentPos.y + 1 * moveDir].currentUnit == null)
         {
             movableNodes.Add(unitManager.map[currentPos.x, currentPos.y + 1 * moveDir]);
             if (!isMoved && unitManager.map[currentPos.x, currentPos.y + 2 * moveDir].currentUnit == null)
@@ -42,15 +42,15 @@ public class Pawn : Unit
         }
 
         //Enpassant
-        if(currentPos.x != 7
-            &&unitManager.map[currentPos.x + 1, currentPos.y].currentUnit != null 
-            && unitManager.map[currentPos.x + 1, currentPos.y].currentUnit.unitType.ToString().Contains("Pawn") 
+        if (currentPos.x != 7
+            && unitManager.map[currentPos.x + 1, currentPos.y].currentUnit != null
+            && unitManager.map[currentPos.x + 1, currentPos.y].currentUnit.unitType.ToString().Contains("Pawn")
             && ((Pawn)unitManager.map[currentPos.x + 1, currentPos.y].currentUnit).canEnpassant)
         {
             movableNodes.Add(unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir]);
         }
         if (currentPos.x != 0
-            &&unitManager.map[currentPos.x - 1, currentPos.y].currentUnit != null
+            && unitManager.map[currentPos.x - 1, currentPos.y].currentUnit != null
             && unitManager.map[currentPos.x - 1, currentPos.y].currentUnit.unitType.ToString().Contains("Pawn")
             && ((Pawn)unitManager.map[currentPos.x - 1, currentPos.y].currentUnit).canEnpassant)
         {
@@ -64,22 +64,22 @@ public class Pawn : Unit
     }
     public override void MoveUnit(Coord pos)
     {
-        if(Coord.Distance(pos, currentPos) > 1.9f)
+        if (Coord.Distance(pos, currentPos) > 1.9f)
         {
             canEnpassant = true;
         }
         //Enpassant
-        if(pos.x != currentPos.x && unitManager.map[pos.x, pos.y].currentUnit == null)
+        if (pos.x != currentPos.x && unitManager.map[pos.x, pos.y].currentUnit == null)
         {
             unitManager.map[pos.x, currentPos.y].currentUnit.DestroyObject();
         }
         //Promotion
-        if((unitColor == UnitColor.White && pos.y == 7) || (unitColor == UnitColor.Black && pos.y == 0))
+        if ((unitColor == UnitColor.White && pos.y == 7) || (unitColor == UnitColor.Black && pos.y == 0))
         {
-            //ÀÌµ¿(ÇÁ·Î¸ğ¼ÇÀ» ÇÏ±â Àü±îÁö ÅÏÀÌ ³Ñ¾î°¡¸é ¾ÈµÊ)
+            //ì´ë™(í”„ë¡œëª¨ì…˜ì„ í•˜ê¸° ì „ê¹Œì§€ í„´ì´ ë„˜ì–´ê°€ë©´ ì•ˆë¨)
             unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
 
-            //±âº¸ ÀúÀå
+            //ê¸°ë³´ ì €ì¥
             recordManager.records.Add(new Record(unitType, currentPos, pos, unitManager.map[pos.x, pos.y].currentUnit != null));
 
             currentPos = pos;
@@ -101,7 +101,7 @@ public class Pawn : Unit
         isMoved = true;
     }
     /// <summary>
-    /// type¿¡ ÀÖ´Â ±â¹°À» »ı¼º ÈÄ ÀÚ½ÅÀ» ÆÄ±«
+    /// typeì— ìˆëŠ” ê¸°ë¬¼ì„ ìƒì„± í›„ ìì‹ ì„ íŒŒê´´
     /// </summary>
     public void Promotion(UnitType type)
     {
@@ -109,23 +109,23 @@ public class Pawn : Unit
         unit.transform.position = new Vector3(transform.position.x, 14, transform.position.z);
         unit.GetComponent<Unit>().currentPos = currentPos;
         unit.GetComponent<Unit>().unitManager = unitManager;
-        
+
         unitManager.units[(int)unitColor].Remove(this);
         unitManager.units[(int)unitColor].Add(unit.GetComponent<Unit>());
 
         unitManager.map[currentPos.x, currentPos.y].currentUnit = unit.GetComponent<Unit>();
 
         GameManager.Instance.TurnChange();
-        GameManager.Instance.isOnPromotion = false; 
+        GameManager.Instance.isOnPromotion = false;
         Destroy(gameObject);
     }
     /// <summary>
-    /// ÇÁ·Î¸ğ¼Ç ¿ÀºêÁ§Æ®¸¦ ÀÚ½Å ¾Õ¿¡ »ı¼º
+    /// í”„ë¡œëª¨ì…˜ ì˜¤ë¸Œì íŠ¸ë¥¼ ìì‹  ì•ì— ìƒì„±
     /// </summary>
     void SetPromotionObj()
     {
         GameManager.Instance.isOnPromotion = true;
-        if(unitColor == UnitColor.Black)
+        if (unitColor == UnitColor.Black)
         {
             blackPromotionObj.gameObject.SetActive(true);
             blackPromotionObj.position = new Vector3(transform.position.x, blackPromotionObj.position.y, blackPromotionObj.position.z);
@@ -139,7 +139,7 @@ public class Pawn : Unit
     public override bool Check_Illegalmove(Coord coord)
     {
         //Enpassant
-        if(Coord.Distance(coord, currentPos) > 1 && unitManager.map[coord.x, coord.y].currentUnit == null)
+        if (Coord.Distance(coord, currentPos) > 1 && unitManager.map[coord.x, coord.y].currentUnit == null)
         {
             bool isIllegalmove = false;
 
@@ -150,7 +150,7 @@ public class Pawn : Unit
             Coord originCoord = currentPos;
             currentPos = coord;
 
-            isIllegalmove = GameManager.Instance.Check_Check();
+            isIllegalmove = GameManager.Instance.Check_Check(unitColor);
 
             currentPos = originCoord;
             unitManager.map[currentPos.x, currentPos.y].currentUnit = this;

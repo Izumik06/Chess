@@ -12,8 +12,8 @@ public class Unit : MonoBehaviour
     public UnitColor unitColor;
     public Coord currentPos;
 
-    //Æù¿¡¼­¸¸ »ç¿ëµÇ´Â º¯¼ö
-    //Èæ, ¹é¿¡µû¶ó ÆùÀÌ ÀÌµ¿ÇÏ´Â ¹æÇâ
+    //í°ì—ì„œë§Œ ì‚¬ìš©ë˜ëŠ” ë³€ìˆ˜
+    //í‘, ë°±ì—ë”°ë¼ í°ì´ ì´ë™í•˜ëŠ” ë°©í–¥
     public int moveDir;
 
     private void Start()
@@ -31,7 +31,7 @@ public class Unit : MonoBehaviour
         recordManager = GameObject.Find("RecordManager").GetComponent<RecordManager>();
     }
     /// <summary>
-    /// ÇöÀç ±â¹°ÀÇ ÀÌµ¿ °¡´ÉÇÑ Ä­À» È°¼ºÈ­½ÃÅ´
+    /// í˜„ì¬ ê¸°ë¬¼ì˜ ì´ë™ ê°€ëŠ¥í•œ ì¹¸ì„ í™œì„±í™”ì‹œí‚´
     /// </summary>
     public void ShowMovableNode()
     {
@@ -42,14 +42,14 @@ public class Unit : MonoBehaviour
         }
     }
     /// <summary>
-    /// ÇöÀç ±â¹°ÀÇ ÀÌµ¿ °¡´ÉÇÑ Ä­À» °¡Á®¿À´Â ÇÔ¼ö
+    /// í˜„ì¬ ê¸°ë¬¼ì˜ ì´ë™ ê°€ëŠ¥í•œ ì¹¸ì„ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜
     /// </summary>
     public virtual List<Node> GetMovableNode()
     {
         return null;
     }
     /// <summary>
-    /// ÇØ´ç ÁÂÇ¥·Î ±â¹°À» ÀÌµ¿
+    /// í•´ë‹¹ ì¢Œí‘œë¡œ ê¸°ë¬¼ì„ ì´ë™
     /// </summary>
     public virtual void MoveUnit(Coord pos)
     {
@@ -66,19 +66,19 @@ public class Unit : MonoBehaviour
         }
         unitManager.map[pos.x, pos.y].currentUnit = this;
 
-        //±âº¸ ÀúÀå
+        //ê¸°ë³´ ì €ì¥
         recordManager.records.Add(new Record(unitType, beforePos, pos, isKillUnit));
 
         GameManager.Instance.TurnChange();
     }
     /// <summary>
-    /// ÇöÀç À¯´ÖÀÌ ÇØ´ç ÁÂÇ¥·Î ÀÌµ¿ÇÒ ¼ö ÀÖ´ÂÁö È®ÀÎ
+    /// í˜„ì¬ ìœ ë‹›ì´ í•´ë‹¹ ì¢Œí‘œë¡œ ì´ë™í•  ìˆ˜ ìˆëŠ”ì§€ í™•ì¸
     /// </summary>
     public virtual bool Check_Illegalmove(Coord coord)
     {
         bool isIllegalmove = false;
 
-        //ÇØ´ç ÁÂÇ¥·Î ÀÌµ¿
+        //í•´ë‹¹ ì¢Œí‘œë¡œ ì´ë™
         Unit unit = unitManager.map[coord.x, coord.y].currentUnit;
         unitManager.map[coord.x, coord.y].currentUnit = this;
         unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
@@ -86,10 +86,11 @@ public class Unit : MonoBehaviour
         currentPos = coord;
         unitManager.map[coord.x, coord.y].currentUnit = this;
 
-        //Ã¼Å©ÀÎÁö È®ÀÎ
-        isIllegalmove = GameManager.Instance.Check_Check();
 
-        //ÀÌµ¿ ÀüÀÇ ÁÂÇ¥·Î º¹±¸
+        //ì²´í¬ì¸ì§€ í™•ì¸
+        isIllegalmove = GameManager.Instance.Check_Check(unitColor);
+
+        //ì´ë™ ì „ì˜ ì¢Œí‘œë¡œ ë³µêµ¬
         currentPos = originCoord;
         unitManager.map[currentPos.x, currentPos.y].currentUnit = this;
         unitManager.map[coord.x, coord.y].currentUnit = unit;
@@ -97,7 +98,7 @@ public class Unit : MonoBehaviour
         return isIllegalmove;
     }
     /// <summary>
-    /// ±â¹°ÀÌ ÀâÇûÀ» ¶§ ½ÇÇàµÉ ÇÔ¼ö
+    /// ê¸°ë¬¼ì´ ì¡í˜”ì„ ë•Œ ì‹¤í–‰ë  í•¨ìˆ˜
     /// </summary>
     public void DestroyObject()
     {

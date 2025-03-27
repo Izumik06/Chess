@@ -9,7 +9,7 @@ public class Bishop : Unit
     {
         List<Node> movableNodes = new List<Node>();
 
-        // �� �˻�
+        // ↗ 검사
         for (int i = 1, j = 1; i < 8; i++, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -28,7 +28,7 @@ public class Bishop : Unit
             }
         }
 
-        // �� �˻�
+        // ↘ 검사
         for (int i = 1, j = -1; i < 8; i++, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -48,7 +48,7 @@ public class Bishop : Unit
             }
         }
 
-        // �� �˻�
+        // ↙ 검사
         for (int i = -1, j = -1; i > -8; i--, j--)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -67,7 +67,7 @@ public class Bishop : Unit
             }
         }
 
-        // �� �˻�
+        // ↖ 검사
         for (int i = -1, j = 1; i < 8; i--, j++)
         {
             Coord pos = new Coord(i + currentPos.x, j + currentPos.y);
@@ -86,11 +86,8 @@ public class Bishop : Unit
             }
         }
 
-        //�ݼ� ����
+        //금수 제거
         movableNodes = movableNodes.Where(_ => !Check_Illegalmove(_.pos)).ToList();
         return movableNodes;
-    }
-    void asdf(){
-        
     }
 }

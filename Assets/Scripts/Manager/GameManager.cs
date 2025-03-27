@@ -45,14 +45,17 @@ public class GameManager : MonoBehaviour
     
     IEnumerator UpdateTimer()
     {
-        yield return new WaitForSeconds(1f);
-        if (turnPlayer == player1Color)
+        while(player1Timer > 0 && player2Timer > 0)
         {
-            player1Timer -= 1;
-        }
-        else
-        {
-            player2Timer -= 1;
+            yield return new WaitForSeconds(1f);
+            if (turnPlayer == player1Color)
+            {
+                player1Timer -= 1;
+            }
+            else
+            {
+                player2Timer -= 1;
+            }
         }
     }
     
@@ -74,24 +77,24 @@ public class GameManager : MonoBehaviour
                 ((Pawn)unitManager.units[(int)turnPlayer][i]).canEnpassant = false;
             }
         }
-        uiManager.SetRecord();
-        if (Check_Mate())
+        if (Check_Mate(turnPlayer))
         {
-            if (Check_Check())
+            if (Check_Check(turnPlayer))
             {
-                Debug.Log("√º≈©∏ﬁ¿Ã∆Æ");
+                Debug.Log("Ï≤¥ÌÅ¨Î©îÏù¥Ìä∏");
             }
             else
             {
-                Debug.Log("Ω∫≈◊¿œ∏ﬁ¿Ã∆Æ");
+                Debug.Log("Ïä§ÌÖåÏùºÎ©îÏù¥Ìä∏");
             }
         }
+        uiManager.SetRecord();
     }
-    public bool Check_Mate()
+    public bool Check_Mate(UnitColor unitColor)
     {
-        for(int i = 0; i < unitManager.units[(int)turnPlayer].Count; i++)
+        for(int i = 0; i < unitManager.units[(int)unitColor].Count; i++)
         {
-            unitManager.units[(int)turnPlayer][i].ShowMovableNode();
+            unitManager.units[(int)unitColor][i].ShowMovableNode();
         }
         bool canMove = false;
         for(int i = 0; i < 8; i++)
@@ -114,15 +117,14 @@ public class GameManager : MonoBehaviour
         }
         return true;
     }
-    public bool Check_Check()
+    public bool Check_Check(UnitColor unitColor)
     {
-        King king = unitManager.units[(int)turnPlayer].Where(_ => _.unitColor == turnPlayer && _.unitType.ToString().Contains("King")).ToList()[0].GetComponent<King>();
+        King king = unitManager.units[(int)unitColor].Where(_ => _.unitColor == unitColor && _.unitType.ToString().Contains("King")).ToList()[0].GetComponent<King>();
         Coord currentPos = king.currentPos;
-        UnitColor unitColor = king.unitColor;
         int moveDir = king.moveDir;
         
 
-        //ªÛ«œ¡¬øÏ ∞ÀªÁ
+        //ÏÉÅÌïòÏ¢åÏö∞ Í≤ÄÏÇ¨
         List<Coord> coords = new List<Coord> { new Coord(0, 1), new Coord(1, 0), new Coord(-1, 0), new Coord(0, -1) };
         for (int i = 0; i < 4; i++)
         {
@@ -143,7 +145,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        //¥Î∞¢º± ∞ÀªÁ
+        //ÎåÄÍ∞ÅÏÑ† Í≤ÄÏÇ¨
         coords = new List<Coord> { new Coord(1, 1), new Coord(1, -1), new Coord(-1, 1), new Coord(-1, -1) };
         for (int i = 0; i < 4; i++)
         {
@@ -174,8 +176,8 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        //∑Ë, ƒ˝ »Æ¿Œ
-        //ªÛ
+        //Î£©, ÌÄ∏ ÌôïÏù∏
+        //ÏÉÅ
         for (int i = 1; i <= 8; i++)
         {
             Coord checkCoord = new Coord(currentPos.x, currentPos.y + i);
@@ -197,7 +199,7 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        //«œ
+        //Ìïò
         for (int i = 1; i <= 8; i++)
         {
             Coord checkCoord = new Coord(currentPos.x, currentPos.y - i);
@@ -219,7 +221,7 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        //øÏ
+        //Ïö∞
         for (int i = 1; i <= 8; i++)
         {
             Coord checkCoord = new Coord(currentPos.x + i, currentPos.y);
@@ -241,7 +243,7 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        //¡¬
+        //Ï¢å
         for (int i = 1; i <= 8; i++)
         {
             Coord checkCoord = new Coord(currentPos.x - i, currentPos.y);
@@ -265,7 +267,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        //∫ÒºÛ, ƒ˝ »Æ¿Œ
+        //ÎπÑÏàç, ÌÄ∏ ÌôïÏù∏
         for (int i = 1; i <= 8; i++)
         {
             Coord checkCoord = new Coord(currentPos.x + i, currentPos.y + i);
@@ -351,7 +353,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        //≥™¿Ã∆Æ ∞ÀªÁ
+        //ÎÇòÏù¥Ìä∏ Í≤ÄÏÇ¨
         coords = new List<Coord>() { new Coord(1, 2), new Coord(1, -2), new Coord(-1, 2), new Coord(-1, -2), new Coord(2, 1), new Coord(2, -1), new Coord(-2, 1), new Coord(-2, -1) };
         for(int i = 0; i < 8; i++)
         {

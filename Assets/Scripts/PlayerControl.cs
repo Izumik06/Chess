@@ -9,8 +9,8 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //¼±ÅÃµÈ ±â¹°À» ¸¶¿ì½º À§Ä¡·Î ÀÌµ¿
-        if(selectedUnit != null)
+        //ì„ íƒëœ ê¸°ë¬¼ì„ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¡œ ì´ë™
+        if (selectedUnit != null)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -41,7 +41,7 @@ public class PlayerControl : MonoBehaviour
         }
     }
     /// <summary>
-    /// ¸¶¿ì½º À§Ä¡¿¡ ÀÖ´Â ±â¹°À» ¼±ÅÃ
+    /// ë§ˆìš°ìŠ¤ ìœ„ì¹˜ì— ìˆëŠ” ê¸°ë¬¼ì„ ì„ íƒ
     /// </summary>
     void SelectUnit()
     {
@@ -61,7 +61,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     /// <summary>
-    /// ¼±ÅÃµÈ ±â¹°À» ¸¶¿ì½º À§Ä¡¿¡ ÀÖ´Â ³ëµå·Î ÀÌµ¿
+    /// ì„ íƒëœ ê¸°ë¬¼ì„ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ì— ìˆëŠ” ë…¸ë“œë¡œ ì´ë™
     /// </summary>
     void MoveUnit()
     {
@@ -71,14 +71,14 @@ public class PlayerControl : MonoBehaviour
         {
             GameManager.Instance.ClearNode();
 
-            //ÀÌµ¿ ÈÄ¿¡µµ update¿¡ ÀÖ´Â ¸¶¿ì½º À§Ä¡ ÀÌµ¿ÄÚµå·Î ÀÎÇØ Àß¸øµÈ À§Ä¡·Î °¡´Â »óÈ² ¿¹¹æ
+            //ì´ë™ í›„ì—ë„ updateì— ìˆëŠ” ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì´ë™ì½”ë“œë¡œ ì¸í•´ ì˜ëª»ëœ ìœ„ì¹˜ë¡œ ê°€ëŠ” ìƒí™© ì˜ˆë°©
             Unit unit = selectedUnit;
             selectedUnit = null;
 
             unit.GetComponent<Collider>().isTrigger = false;
             unit.MoveUnit(hit.transform.GetComponent<Node>().pos);
         }
-        //¸¶¿ì½ºÀÇ À§Ä¡¿¡ È°¼ºÈ­µÈ Ä­ÀÌ ¾øÀ» ½Ã ¿ø·¡ À§Ä¡·Î ÀÌµ¿
+        //ë§ˆìš°ìŠ¤ì˜ ìœ„ì¹˜ì— í™œì„±í™”ëœ ì¹¸ì´ ì—†ì„ ì‹œ ì›ë˜ ìœ„ì¹˜ë¡œ ì´ë™
         else
         {
             selectedUnit.transform.position = new Vector3(GameManager.Instance.map[(int)selectedUnit.currentPos.x, (int)selectedUnit.currentPos.y].transform.position.x, 14, GameManager.Instance.map[(int)selectedUnit.currentPos.x, (int)selectedUnit.currentPos.y].transform.position.z);

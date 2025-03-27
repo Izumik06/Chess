@@ -11,8 +11,8 @@ public class Rook : Unit
     {
         List<Node> movableNodes = new List<Node>();
 
-        //ÁÂ ¿ì °Ë»ç
-        for(int j = -1; j < 2; j += 2)
+        //ì¢Œ ìš° ê²€ì‚¬
+        for (int j = -1; j < 2; j += 2)
         {
             for (int i = 1; i < 8; i++)
             {
@@ -32,9 +32,9 @@ public class Rook : Unit
                 }
             }
         }
-        
-        //»ó ÇÏ °Ë»ç
-        for(int j = -1; j < 2; j += 2)
+
+        //ìƒ í•˜ ê²€ì‚¬
+        for (int j = -1; j < 2; j += 2)
         {
             for (int i = 1; i < 8; i++)
             {
@@ -54,8 +54,8 @@ public class Rook : Unit
                 }
             }
         }
-        
-        //±Ý¼ö Á¦°Å
+
+        //ê¸ˆìˆ˜ ì œê±°
         movableNodes = movableNodes.Where(_ => !Check_Illegalmove(_.pos)).ToList();
         return movableNodes;
     }

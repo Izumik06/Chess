@@ -85,7 +85,7 @@ public class King : Unit
             originRookNode.currentUnit = null;
             rookNode.currentUnit = rook;
 
-            isIllegalmove = GameManager.Instance.Check_Check();
+            isIllegalmove = GameManager.Instance.Check_Check(unitColor);
 
             currentPos = originCoord;
             unitManager.map[currentPos.x, currentPos.y].currentUnit = this;
