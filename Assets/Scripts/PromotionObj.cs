@@ -31,7 +31,8 @@ public class PromotionObj : MonoBehaviour
         {
             promotionInitial = unitType.ToString()[5];
         }
-        GameObject.Find("RecordManager").GetComponent<RecordManager>().records[GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count - 1].recordText += "=" + promotionInitial;
         transform.parent.gameObject.SetActive(false);
+        GameObject.Find("RecordManager").GetComponent<RecordManager>().records[GameObject.Find("RecordManager").GetComponent<RecordManager>().records.Count - 1].recordText += "=" + promotionInitial;
+        GameManager.Instance.TurnChange();
     }
 }

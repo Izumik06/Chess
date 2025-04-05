@@ -11,7 +11,8 @@ public class RecordManager : MonoBehaviour
     UnitManager unitManager;
 
     public List<Record> records = new List<Record>();
-    public string record;
+    public string fen;
+    public int herfMove = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,7 +22,7 @@ public class RecordManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        record = GetFEN();
+        fen = GetFEN();
     }
     /// <summary>
     /// FEN기보를 가져옴
@@ -42,7 +43,14 @@ public class RecordManager : MonoBehaviour
                 {
                     blankCount = 0;
                     string recordPiece = "";
-                    recordPiece += node.currentUnit.unitType.ToString()[5];
+                    if(node.currentUnit.unitType == UnitType.WhiteKnight || node.currentUnit.unitType == UnitType.BlackKnight)
+                    {
+                        recordPiece += "N";
+                    }
+                    else
+                    {
+                        recordPiece += node.currentUnit.unitType.ToString()[5];
+                    }
                     if (node.currentUnit.unitColor == UnitColor.Black)
                     {
                         recordPiece = recordPiece.ToLower();
@@ -58,15 +66,76 @@ public class RecordManager : MonoBehaviour
                     fen += (blankCount + 1).ToString();
                 }
             }
-            fen += '/';
+            if (i != 0) 
+            {
+                fen += '/';
+            }
         }
 
         //턴 표기
         fen += " " + GameManager.Instance.turnPlayer.ToString().ToLower()[0] + " ";
 
         //캐슬링 가능 여부
-        King king = 
-        if()
+        bool canCastling = false;
+        King king = (King)unitManager.units[(int)UnitColor.White].Find(_ => _.unitType == UnitType.WhiteKing);
+        if (!king.isMoved)
+        {
+            List<Unit> rooks = unitManager.units[(int)UnitColor.White].Where(_ => _ is Rook && !((Rook)_).isMoved).ToList();
+            if(rooks.Count != 0)
+            {
+                if (rooks.Exists(_ => _.currentPos == new Coord(7, 0)))
+                {
+                    fen += "K";
+                    canCastling = true;
+                }
+                if (rooks.Exists(_ => _.currentPos == new Coord(0, 0)))
+                {
+                    fen += "Q";
+                    canCastling = true;
+                }
+            }
+        }
+        king = (King)unitManager.units[(int)UnitColor.Black].Find(_ => _.unitType == UnitType.BlackKing);
+        if (!king.isMoved)
+        {
+            List<Unit> rooks = unitManager.units[(int)UnitColor.Black].Where(_ => _ is Rook && !((Rook)_).isMoved).ToList();
+            if (rooks.Count != 0)
+            {
+                if (rooks.Exists(_ => _.currentPos == new Coord(7, 7)))
+                {
+                    fen += "k";
+                    canCastling = true;
+                }
+                if (rooks.Exists(_ => _.currentPos == new Coord(0, 7)))
+                {
+                    fen += "q";
+                    canCastling = true;
+                }
+            }
+        }
+        if (!canCastling)
+        {
+            fen += "-";
+        }
+        fen += " ";
+
+        //앙파상 체크
+        Unit pawn = unitManager.units[GameManager.Instance.turnPlayer == UnitColor.Black ? 1 : 0].Find(_ => _ is Pawn && ((Pawn)_).canEnpassant);
+        if(pawn != null)
+        {
+            Coord position = new Coord(pawn.currentPos.x, (pawn.currentPos.y + (pawn.unitColor == UnitColor.Black ? 1 : -1)));
+            fen += position.ToString();
+        }
+        else
+        {
+            fen += "-";
+        }
+        fen += " ";
+
+        //둔 수
+        fen += herfMove;
+        fen += " ";
+        fen += Mathf.CeilToInt(records.Count / 2 + 1);
         return fen;
     }
 }
@@ -250,8 +319,10 @@ ExitRoop2:
                 }
                 break;
             case "Queen":
+                recordText += "Q";
                 break;
             case "King":
+                recordText += "K";
                 break;
         }
         if (unittype != "Pawn")

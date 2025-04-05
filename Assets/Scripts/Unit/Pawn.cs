@@ -97,7 +97,7 @@ public class Pawn : Unit
         {
             base.MoveUnit(pos);
         }
-
+        recordManager.herfMove = 0;
         isMoved = true;
     }
     /// <summary>
@@ -115,7 +115,6 @@ public class Pawn : Unit
 
         unitManager.map[currentPos.x, currentPos.y].currentUnit = unit.GetComponent<Unit>();
 
-        GameManager.Instance.TurnChange();
         GameManager.Instance.isOnPromotion = false;
         Destroy(gameObject);
     }

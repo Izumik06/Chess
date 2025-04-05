@@ -60,6 +60,17 @@ public class Unit : MonoBehaviour
         currentPos = pos;
         transform.position = new Vector3(unitManager.map[pos.x, pos.y].transform.position.x, 14, unitManager.map[pos.x, pos.y].transform.position.z);
 
+        //기보 관련
+        if (unitType == UnitType.BlackPawn || unitType == UnitType.WhitePawn)
+        {
+            recordManager.herfMove = 0;
+        }
+        else
+        {
+            recordManager.herfMove += 1;
+        }
+
+        //말 잡기
         if (unitManager.map[pos.x, pos.y].currentUnit != null)
         {
             unitManager.map[pos.x, pos.y].currentUnit.DestroyObject();
@@ -69,6 +80,7 @@ public class Unit : MonoBehaviour
         //기보 저장
         recordManager.records.Add(new Record(unitType, beforePos, pos, isKillUnit));
 
+       
         GameManager.Instance.TurnChange();
     }
     /// <summary>
@@ -113,6 +125,7 @@ public class Unit : MonoBehaviour
                 break;
             }
         }
+        recordManager.herfMove = 0;
         gameObject.layer = 0;
     }
 }
@@ -160,6 +173,10 @@ public class Coord
         float num = a.x - b.x;
         float num2 = a.y - b.y;
         return (float)Math.Sqrt(num * num + num2 * num2);
+    }
+    public override string ToString()
+    {
+        return $"{Convert.ToChar('a' + x)}{y + 1}";
     }
 }
 public enum UnitColor
