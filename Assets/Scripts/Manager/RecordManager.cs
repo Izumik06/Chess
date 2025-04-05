@@ -2,22 +2,72 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class RecordManager : MonoBehaviour
 {
+    UnitManager unitManager;
+
     public List<Record> records = new List<Record>();
+    public string record;
     // Start is called before the first frame update
     void Start()
     {
-        
+        unitManager = GameObject.Find("UnitManager").GetComponent<UnitManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        record = GetFEN();
+    }
+    /// <summary>
+    /// FEN기보를 가져옴
+    /// </summary>
+    /// <returns></returns>
+    public string GetFEN()
+    {
+        string fen = "";
+
+        //현재 보드 위의 기물 위치
+        for(int i = 7; i >= 0; i--)
+        {
+            int blankCount = 0;
+            for (int j = 0; j < 8; j++)
+            {
+                Node node = GameManager.Instance.map[j, i];
+                if (node.currentUnit != null)
+                {
+                    blankCount = 0;
+                    string recordPiece = "";
+                    recordPiece += node.currentUnit.unitType.ToString()[5];
+                    if (node.currentUnit.unitColor == UnitColor.Black)
+                    {
+                        recordPiece = recordPiece.ToLower();
+                    }
+                    fen += recordPiece;
+                }
+                else if (j != 7 && GameManager.Instance.map[j + 1, i].currentUnit == null)
+                {
+                    blankCount++;
+                }
+                else
+                {
+                    fen += (blankCount + 1).ToString();
+                }
+            }
+            fen += '/';
+        }
+
+        //턴 표기
+        fen += " " + GameManager.Instance.turnPlayer.ToString().ToLower()[0] + " ";
+
+        //캐슬링 가능 여부
+        King king = 
+        if()
+        return fen;
     }
 }
 
