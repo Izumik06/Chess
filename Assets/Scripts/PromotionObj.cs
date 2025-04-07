@@ -12,6 +12,10 @@ public class PromotionObj : MonoBehaviour
     public UnitColor color;
     private void OnMouseDown()
     {
+        Promotion();
+    }
+    public void Promotion()
+    {
         if (color == UnitColor.White)
         {
             Pawn pawn = (Pawn)unitManager.units[(int)color].Where(_ => _.currentPos.y == 7 && _.unitType == UnitType.WhitePawn).ToList()[0];

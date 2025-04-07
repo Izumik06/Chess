@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
+using System.Drawing;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,10 +21,18 @@ public class GameManager : MonoBehaviour
     public Vector3 node_startPos;
 
     UIManager uiManager;
+    RecordManager recordManager;
+    Stockfish stockfish;
+    PlayerControl playerControl;
 
     public UnitColor player1Color;
-    public int player1Timer;
-    public int player2Timer;
+    public float whiteTimer;
+    public float blackTimer;
+    public bool useBlackStockfish;
+    public bool useWhiteStockfish;
+
+    public bool isEndGame = false;
+    public bool isStartGame = false;
     private void Awake()
     {
         if(instance == null)
@@ -39,26 +48,35 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
+        playerControl = GameObject.Find("PlayerControl").GetComponent<PlayerControl>();
+        stockfish = GameObject.Find("StockFish").GetComponent<Stockfish>();
+        recordManager = GameObject.Find("RecordManager").GetComponent<RecordManager>();
         uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
-        StartCoroutine(UpdateTimer());
     }
-    
-    IEnumerator UpdateTimer()
+
+    private void Update()
     {
-        while(player1Timer > 0 && player2Timer > 0)
+        if(isStartGame && !isEndGame)
         {
-            yield return new WaitForSeconds(1f);
-            if (turnPlayer == player1Color)
+            if (whiteTimer > 0 && blackTimer > 0)
             {
-                player1Timer -= 1;
+                if (turnPlayer == UnitColor.White)
+                {
+                    whiteTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    blackTimer -= Time.deltaTime;
+                }
             }
             else
             {
-                player2Timer -= 1;
+                turnPlayer = 1 - turnPlayer;
+                isEndGame = true;
+                uiManager.SetResultText(false);
             }
         }
     }
-    
     public void TurnChange()
     {
         if (turnPlayer == UnitColor.White)
@@ -77,18 +95,87 @@ public class GameManager : MonoBehaviour
                 ((Pawn)unitManager.units[(int)turnPlayer][i]).canEnpassant = false;
             }
         }
-        if (Check_Mate(turnPlayer))
+        if (Check_Check(turnPlayer))
         {
-            if (Check_Check(turnPlayer))
+            if (Check_Mate(turnPlayer))
             {
-                Debug.Log("체크메이트");
+                recordManager.records[recordManager.records.Count - 1].recordText += "#";
             }
             else
             {
+                recordManager.records[recordManager.records.Count - 1].recordText += "+";
+            }
+        }
+        if (Check_Mate(turnPlayer))
+        {
+            Time.timeScale = 0;
+            isEndGame = true;
+            if (Check_Check(turnPlayer))
+            {
+                Debug.Log("체크메이트");
+                uiManager.SetResultText(false);
+            }
+            else
+            {
+                uiManager.SetResultText(false);
                 Debug.Log("스테일메이트");
             }
         }
+        if(recordManager.herfMove >= 100)
+        {
+            isEndGame = true;
+            uiManager.SetResultText(false);
+            Debug.Log("무승부");
+        }
+        //다음 수를 스톡피쉬가 둘것인지
+        useWhiteStockfish = uiManager.whiteStockfishToggle.isOn;
+        useBlackStockfish = uiManager.blackStockfishToggle.isOn;
+        if (!isEndGame)
+        {
+            if (turnPlayer == UnitColor.Black && useBlackStockfish)
+            {
+                stockfish.depth = (int)uiManager.blackStockfishSlider.value;
+                playerControl.canPlayerControl = false;
+                stockfish.MoveUnit();
+            }
+            else if (turnPlayer == UnitColor.White && useWhiteStockfish)
+            {
+                stockfish.depth = (int)uiManager.whiteStockfishSlider.value;
+                playerControl.canPlayerControl = false;
+                stockfish.MoveUnit();
+            }
+            else
+            {
+                playerControl.canPlayerControl = true;
+            }
+        }
+        
         uiManager.SetRecord();
+    }
+    public void StartGame()
+    {
+        whiteTimer = int.Parse(uiManager.timeInput.text);
+        blackTimer = int.Parse(uiManager.timeInput.text);
+
+        useWhiteStockfish = uiManager.whiteStockfishToggle.isOn;
+        useBlackStockfish = uiManager.blackStockfishToggle.isOn;
+        if (turnPlayer == UnitColor.Black && useBlackStockfish)
+        {
+            stockfish.depth = (int)uiManager.blackStockfishSlider.value;
+            playerControl.canPlayerControl = false;
+            stockfish.MoveUnit();
+        }
+        else if (turnPlayer == UnitColor.White && useWhiteStockfish)
+        {
+            stockfish.depth = (int)uiManager.whiteStockfishSlider.value;
+            playerControl.canPlayerControl = false;
+            stockfish.MoveUnit();
+        }
+        else
+        {
+            playerControl.canPlayerControl = true;
+        }
+        isStartGame = true;
     }
     public bool Check_Mate(UnitColor unitColor)
     {

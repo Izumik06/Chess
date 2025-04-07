@@ -62,7 +62,7 @@ public class Pawn : Unit
 
         return movableNodes;
     }
-    public override void MoveUnit(Coord pos)
+    public override void MoveUnit(Coord pos, bool recordMove)
     {
         if (Coord.Distance(pos, currentPos) > 1.9f)
         {
@@ -95,7 +95,7 @@ public class Pawn : Unit
         }
         else
         {
-            base.MoveUnit(pos);
+            base.MoveUnit(pos, true);
         }
         recordManager.herfMove = 0;
         isMoved = true;

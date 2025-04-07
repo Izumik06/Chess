@@ -59,9 +59,9 @@ public class Rook : Unit
         movableNodes = movableNodes.Where(_ => !Check_Illegalmove(_.pos)).ToList();
         return movableNodes;
     }
-    public override void MoveUnit(Coord pos)
+    public override void MoveUnit(Coord pos, bool recordMove)
     {
-        base.MoveUnit(pos);
+        base.MoveUnit(pos, recordMove);
         isMoved = true;
     }
 }

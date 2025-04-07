@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -13,8 +14,19 @@ public class UIManager : MonoBehaviour
     RecordManager recordManager;
     [SerializeField] List<Color> recordColor = new List<Color>();
 
-    [SerializeField] TextMeshProUGUI player1Timer;
-    [SerializeField] TextMeshProUGUI player2Timer;
+    [SerializeField] TextMeshProUGUI whiteTimer;
+    [SerializeField] TextMeshProUGUI blackTimer;
+    public Toggle whiteStockfishToggle;
+    public Toggle blackStockfishToggle;
+
+    public Slider whiteStockfishSlider;
+    public Slider blackStockfishSlider;
+
+    [SerializeField] GameObject beforeStartUI;
+
+    [SerializeField] TextMeshProUGUI resultText;
+    [SerializeField] GameObject endUI;
+    public TMP_InputField timeInput;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,8 +40,20 @@ public class UIManager : MonoBehaviour
     }
     void UpdateTimerUI()
     {
-        player1Timer.text = (GameManager.Instance.player1Timer / 60).ToString("00") + ":" + (GameManager.Instance.player1Timer % 60).ToString("00");
-        player2Timer.text = (GameManager.Instance.player2Timer / 60).ToString("00") + ":" + (GameManager.Instance.player2Timer % 60).ToString("00");
+        whiteTimer.text = ((int)GameManager.Instance.whiteTimer / 60).ToString("00") + ":" + ((int)GameManager.Instance.whiteTimer % 60).ToString("00");
+        blackTimer.text = ((int)GameManager.Instance.blackTimer / 60).ToString("00") + ":" + ((int)GameManager.Instance.blackTimer % 60).ToString("00");
+    }
+    public void SetResultText(bool isDraw)
+    { 
+        if (isDraw)
+        {
+            resultText.text = "Draw";
+        }
+        else
+        {
+            resultText.text = ((UnitColor)(1 - GameManager.Instance.turnPlayer)).ToString() + " Win!";
+        }
+        endUI.SetActive(true);
     }
     public void SetRecord()
     {
@@ -51,5 +75,16 @@ public class UIManager : MonoBehaviour
             recordText = recordBars[recordBars.Count - 1].transform.GetChild(2).GetComponent<TextMeshProUGUI>();
         }
         recordText.text = record.recordText;
+    }
+    public void StartBtn()
+    {
+        if (timeInput.text == "") { return; }
+        GameManager.Instance.StartGame();
+        beforeStartUI.SetActive(false);
+    }
+    public void RestartBtn()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(0);
     }
 }

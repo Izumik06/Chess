@@ -100,7 +100,7 @@ public class King : Unit
             return base.Check_Illegalmove(coord);
         }
     }
-    public override void MoveUnit(Coord pos)
+    public override void MoveUnit(Coord pos, bool recordMove)
     {
         //castling
         if (!isMoved && Coord.Distance(pos, currentPos) > 1.9f)
@@ -108,14 +108,14 @@ public class King : Unit
             //O-O
             if (pos == new Coord(6, currentPos.y))
             {
-                unitManager.map[7, currentPos.y].currentUnit.MoveUnit(new Coord(5, currentPos.y));
                 recordManager.records.Add(new Record(unitColor, "O-O"));
+                unitManager.map[7, currentPos.y].currentUnit.MoveUnit(new Coord(5, currentPos.y), false);
             }
             //O-O
             else
             {
-                unitManager.map[0, currentPos.y].currentUnit.MoveUnit(new Coord(3, currentPos.y));
                 recordManager.records.Add(new Record(unitColor, "O-O-O"));
+                unitManager.map[0, currentPos.y].currentUnit.MoveUnit(new Coord(3, currentPos.y), false);
             }
 
             unitManager.map[currentPos.x, currentPos.y].currentUnit = null;
@@ -127,7 +127,7 @@ public class King : Unit
         }
         else
         {
-            base.MoveUnit(pos);
+            base.MoveUnit(pos, true);
         }
         isMoved = true;
     }

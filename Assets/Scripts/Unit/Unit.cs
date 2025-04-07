@@ -30,6 +30,13 @@ public class Unit : MonoBehaviour
         }
         recordManager = GameObject.Find("RecordManager").GetComponent<RecordManager>();
     }
+    private void Update()
+    {
+        if(transform.position.y < 12)
+        {
+            transform.position = new Vector3(unitManager.map[currentPos.x, currentPos.y].transform.position.x, 14, unitManager.map[currentPos.x, currentPos.y].transform.position.z);
+        }
+    }
     /// <summary>
     /// 현재 기물의 이동 가능한 칸을 활성화시킴
     /// </summary>
@@ -51,7 +58,7 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// 해당 좌표로 기물을 이동
     /// </summary>
-    public virtual void MoveUnit(Coord pos)
+    public virtual void MoveUnit(Coord pos, bool recordMove)
     {
         Coord beforePos = currentPos;
         bool isKillUnit = unitManager.map[pos.x, pos.y].currentUnit != null;
@@ -78,7 +85,7 @@ public class Unit : MonoBehaviour
         unitManager.map[pos.x, pos.y].currentUnit = this;
 
         //기보 저장
-        recordManager.records.Add(new Record(unitType, beforePos, pos, isKillUnit));
+        if (recordMove) { recordManager.records.Add(new Record(unitType, beforePos, pos, isKillUnit)); }
 
        
         GameManager.Instance.TurnChange();
@@ -177,6 +184,10 @@ public class Coord
     public override string ToString()
     {
         return $"{Convert.ToChar('a' + x)}{y + 1}";
+    }
+    public static Coord FromString(string s)
+    {
+        return new Coord(s[0] - 'a', int.Parse(s[1].ToString()) - 1);
     }
 }
 public enum UnitColor

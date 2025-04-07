@@ -333,19 +333,6 @@ ExitRoop2:
             }
         }
         recordText += $"{(char)(afterCoord.x + (int)'a')}{afterCoord.y + 1}";
-
-        if (GameManager.Instance.Check_Check(1 - color))
-        {
-            if(GameManager.Instance.Check_Mate(1- color))
-            {
-                recordText += "#";
-            }
-            else
-            {
-                recordText += "+";
-            }
-        }
-
     }
     public Record(UnitColor color, string recordText)
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Analytics;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -16,11 +17,15 @@ public class Stockfish : MonoBehaviour
         public string continuation;
     }
     public ApiAnswer answer;
+    PlayerControl playerControl;
     RecordManager recordManager;
     public int depth = 12;
+
+    Coroutine coroutine;
     // Start is called before the first frame update
     void Start()
     {
+        playerControl = GameObject.Find("PlayerControl").GetComponent<PlayerControl>();
         recordManager = GameObject.Find("RecordManager").GetComponent<RecordManager>();
     }
 
@@ -29,25 +34,60 @@ public class Stockfish : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            StartCoroutine(UnityWebRequestGet());
+            Time.timeScale = 0;
+            StopCoroutine(coroutine);
         }
+        if (GameManager.Instance.isEndGame)
+        {
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+        }
+    }
+    public void MoveUnit()
+    {
+        coroutine = StartCoroutine(UnityWebRequestGet());
     }
     IEnumerator UnityWebRequestGet()
     {
         string url = $"https://stockfish.online/api/s/v2.php?fen={recordManager.GetFEN()}&depth={depth}";
+        Debug.Log(url);
+        UnityWebRequest www = UnityWebRequest.Get(url); //ìš”ì²­
 
-        UnityWebRequest www = UnityWebRequest.Get(url); //¿äÃ»
-
-        yield return www.SendWebRequest();//º¸³½ µÚ ÀÀ´ä ¿äÃ»±îÁö ±â´Ù¸²
+        yield return www.SendWebRequest();//ìš”ì²­ ë³´ë‚´ê³  ê¸°ë‹¤ë¦¬ê¸°
 
         if(www.error == null)
         {
             answer = JsonUtility.FromJson<ApiAnswer>(www.downloadHandler.text);
-            Debug.Log(www.downloadHandler.text);
+            Coord unitPos = Coord.FromString(answer.bestmove.Substring(9, 2));
+            Coord destination = Coord.FromString(answer.bestmove.Substring(11, 2));
+            playerControl.selectedUnit = GameManager.Instance.map[unitPos.x, unitPos.y].currentUnit;
+            playerControl.MoveUnit(destination);
+            if (answer.bestmove.Length > 13 && answer.bestmove[13] != ' ')
+            {
+                int index = 0;
+                switch (answer.bestmove[13])
+                {
+                    case 'q':
+                        index = 3;
+                        break;
+                    case 'n':
+                        index = 2;
+                        break;
+                    case 'b':
+                        index = 1;
+                        break;
+                    case 'r':
+                        index = 0;
+                        break;
+                }
+                GameObject.Find(GameManager.Instance.turnPlayer.ToString() + "PromotionObj").transform.GetChild(index).GetComponent<PromotionObj>().Promotion();
+            }
         }
         else
         {
-            Debug.Log("¤¸µÊ");
+            Debug.Log("ì‹¤íŒ¨");
         }
     }
 
