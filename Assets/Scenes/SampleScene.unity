@@ -391,7 +391,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &156513817
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3957,6 +3957,7 @@ MonoBehaviour:
   blackStockfishSlider: {fileID: 1598110405}
   beforeStartUI: {fileID: 1154546592}
   resultText: {fileID: 1250525110}
+  endUI: {fileID: 156513816}
   timeInput: {fileID: 836491091}
 --- !u!4 &1077220073
 Transform:
@@ -3986,7 +3987,7 @@ GameObject:
   - component: {fileID: 1079962273}
   - component: {fileID: 1079962272}
   m_Layer: 5
-  m_Name: StartBrn
+  m_Name: ReStartBrn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4058,7 +4059,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1077220072}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-        m_MethodName: StartBtn
+        m_MethodName: RestartBtn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
