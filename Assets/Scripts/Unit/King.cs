@@ -124,6 +124,7 @@ public class King : Unit
             transform.position = new Vector3(unitManager.map[pos.x, pos.y].transform.position.x, 14, unitManager.map[pos.x, pos.y].transform.position.z);
 
             unitManager.map[pos.x, pos.y].currentUnit = this;
+            audioSource.Play();
         }
         else
         {

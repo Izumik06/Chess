@@ -12,6 +12,7 @@ public class Unit : MonoBehaviour
     public UnitColor unitColor;
     public Coord currentPos;
 
+    protected AudioSource audioSource;
     //폰에서만 사용되는 변수
     //흑, 백에따라 폰이 이동하는 방향
     public int moveDir;
@@ -29,6 +30,7 @@ public class Unit : MonoBehaviour
             unitColor = UnitColor.Black;
         }
         recordManager = GameObject.Find("RecordManager").GetComponent<RecordManager>();
+        audioSource = GetComponent<AudioSource>();
     }
     private void Update()
     {
@@ -46,6 +48,7 @@ public class Unit : MonoBehaviour
         for (int i = 0; i < movableNode.Count; i++)
         {
             movableNode[i].gameObject.SetActive(true);
+            movableNode[i].SetNodeStatus(NodeStatus.Movable);
         }
     }
     /// <summary>
@@ -87,7 +90,7 @@ public class Unit : MonoBehaviour
         //기보 저장
         if (recordMove) { recordManager.records.Add(new Record(unitType, beforePos, pos, isKillUnit)); }
 
-       
+        audioSource.Play();
         GameManager.Instance.TurnChange();
     }
     /// <summary>

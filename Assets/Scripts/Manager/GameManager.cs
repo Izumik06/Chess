@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using UnityEngine;
 using System.Drawing;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -38,7 +39,6 @@ public class GameManager : MonoBehaviour
         if(instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -87,16 +87,34 @@ public class GameManager : MonoBehaviour
         {
             turnPlayer = UnitColor.White;
         }
-
+        
         for (int i = 0; i < unitManager.units[(int)turnPlayer].Count; i++)
         {
-            if (unitManager.units[(int)turnPlayer][i].unitType == (UnitType)Enum.Parse(typeof(UnitType), turnPlayer.ToString() + "Pawn"))
+            if (unitManager.units[(int)turnPlayer][i] is Pawn)
             {
                 ((Pawn)unitManager.units[(int)turnPlayer][i]).canEnpassant = false;
             }
         }
-        if (Check_Check(turnPlayer))
+
+        //표시된 체크 끄기
+        for (int i = 0; i < 8; i++)
         {
+            for (int j = 0; j < 8; j++)
+            {
+                map[i, j].ResetNode();
+            }
+        }
+
+        Node checkingNode;
+        if (Check_Check(turnPlayer, out checkingNode))
+        {
+            //체크 표시
+            Debug.Log(1);
+            Debug.Log($"Node = {checkingNode.pos.x}{checkingNode.pos.y}");
+            checkingNode.gameObject.SetActive(true);
+            checkingNode.SetNodeStatus(NodeStatus.CheckingNode);
+            checkingNode.ShowLine(unitManager.units[(int)turnPlayer].Find(_ =>_ is King).transform.position);
+
             if (Check_Mate(turnPlayer))
             {
                 recordManager.records[recordManager.records.Count - 1].recordText += "#";
@@ -108,7 +126,6 @@ public class GameManager : MonoBehaviour
         }
         if (Check_Mate(turnPlayer))
         {
-            Time.timeScale = 0;
             isEndGame = true;
             if (Check_Check(turnPlayer))
             {
@@ -179,34 +196,26 @@ public class GameManager : MonoBehaviour
     }
     public bool Check_Mate(UnitColor unitColor)
     {
-        for(int i = 0; i < unitManager.units[(int)unitColor].Count; i++)
+        List<Node> movableNodes = new List<Node>();
+        foreach(Unit unit in unitManager.units[(int)unitColor])
         {
-            unitManager.units[(int)unitColor][i].ShowMovableNode();
+            movableNodes.AddRange(unit.GetMovableNode());
         }
+        movableNodes = movableNodes.Distinct().ToList();
         bool canMove = false;
-        for(int i = 0; i < 8; i++)
+        foreach(Node node in movableNodes)
         {
-            for(int j = 0; j < 8; j++)
+            if(node.status != NodeStatus.CheckingNode)
             {
-                if (map[i, j].gameObject.activeSelf)
-                {
-                    canMove = true;
-                    map[i, j].gameObject.SetActive(false);
-                    continue;
-                }
-                map[i, j].gameObject.SetActive(false);
+                node.gameObject.SetActive(false);
             }
+            canMove = true;
         }
-
-        if (canMove)
-        {
-            return false;
-        }
-        return true;
+        return !canMove;
     }
-    public bool Check_Check(UnitColor unitColor)
+    public bool Check_Check(UnitColor unitColor, out Node checkingNode)
     {
-        King king = unitManager.units[(int)unitColor].Where(_ => _.unitColor == unitColor && _.unitType.ToString().Contains("King")).ToList()[0].GetComponent<King>();
+        King king = (King)unitManager.units[(int)unitColor].Find(_ => _ is King);
         Coord currentPos = king.currentPos;
         int moveDir = king.moveDir;
         
@@ -217,15 +226,15 @@ public class GameManager : MonoBehaviour
         {
             Coord pos = currentPos + coords[i];
             if (pos.IsOverBoard()) { continue; }
-            if (unitManager.map[pos.x, pos.y].currentUnit != null)
+            if (map[pos.x, pos.y].currentUnit != null)
             {
-                if (unitManager.map[pos.x, pos.y].currentUnit.unitColor != unitColor)
+                if (map[pos.x, pos.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("Rook")
-                        || unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("Queen")
-                        || unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("King"))
+                    if (map[pos.x, pos.y].currentUnit is Rook
+                        || map[pos.x, pos.y].currentUnit is Queen
+                        || map[pos.x, pos.y].currentUnit is King)
                     {
-                        Debug.Log($"{pos.x}, {pos.y}");
+                        checkingNode = map[pos.x, pos.y];
                         return true;
                     }
                 }
@@ -238,25 +247,25 @@ public class GameManager : MonoBehaviour
         {
             Coord pos = currentPos + coords[i];
             if (pos.IsOverBoard()) { continue; }
-            if (unitManager.map[pos.x, pos.y].currentUnit != null)
+            if (map[pos.x, pos.y].currentUnit != null)
             {
-                if (unitManager.map[pos.x, pos.y].currentUnit.unitColor != unitColor)
+                if (map[pos.x, pos.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("Bishop")
-                        || unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("Queen")
-                        || unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("King"))
+                    if (map[pos.x, pos.y].currentUnit is Bishop
+                        || map[pos.x, pos.y].currentUnit is Queen
+                        || map[pos.x, pos.y].currentUnit is King)
                     {
-                        Debug.Log($"{pos.x}, {pos.y}");
+                        checkingNode = map[pos.x, pos.y];
                         return true;
                     }
-                    if (pos == new Coord(currentPos.x + 1, currentPos.y + 1 * moveDir) && unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("Pawn"))
+                    if (pos == new Coord(currentPos.x + 1, currentPos.y + 1 * moveDir) && map[pos.x, pos.y].currentUnit is Pawn)
                     {
-                        Debug.Log($"{pos.x}, {pos.y}");
+                        checkingNode = map[pos.x, pos.y];
                         return true;
                     }
-                    else if (pos == new Coord(currentPos.x - 1, currentPos.y + 1 * moveDir) && unitManager.map[pos.x, pos.y].currentUnit.unitType.ToString().Contains("Pawn"))
+                    else if (pos == new Coord(currentPos.x - 1, currentPos.y + 1 * moveDir) && map[pos.x, pos.y].currentUnit is Pawn)
                     {
-                        Debug.Log($"{pos.x}, {pos.y}");
+                        checkingNode = map[pos.x, pos.y];
                         return true;
                     }
                 }
@@ -272,14 +281,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if(unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if(map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Rook")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Rook
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{map[checkCoord.x, checkCoord.y].name}, {checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -294,14 +303,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if(unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if(map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Rook")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Rook
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -316,14 +325,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if (map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Rook")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Rook
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -338,15 +347,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if (map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    Debug.Log(2);
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Rook")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Rook
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -362,14 +370,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if (map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Bishop")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Bishop
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -383,14 +391,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if (map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Bishop")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Bishop
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -404,14 +412,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if (map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Bishop")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Bishop
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -425,14 +433,14 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit != null)
+            if (map[checkCoord.x, checkCoord.y].currentUnit != null)
             {
-                if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
+                if (map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor)
                 {
-                    if (unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Bishop")
-                        || unitManager.map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Queen"))
+                    if (map[checkCoord.x, checkCoord.y].currentUnit is Bishop
+                        || map[checkCoord.x, checkCoord.y].currentUnit is Queen)
                     {
-                        Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                        checkingNode = map[checkCoord.x, checkCoord.y];
                         return true;
                     }
                 }
@@ -448,12 +456,17 @@ public class GameManager : MonoBehaviour
             if (checkCoord.IsOverBoard()) { continue; }
             if (map[checkCoord.x, checkCoord.y].currentUnit != null && map[checkCoord.x, checkCoord.y].currentUnit.unitColor != unitColor && map[checkCoord.x, checkCoord.y].currentUnit.unitType.ToString().Contains("Knight"))
             {
-                Debug.Log($"{checkCoord.x}, {checkCoord.y}");
+                checkingNode = map[checkCoord.x, checkCoord.y];
                 return true;
             }
         }
-
+        checkingNode = null;
         return false;
+    }
+    public bool Check_Check(UnitColor color)
+    {
+        Node tempNode;
+        return Check_Check(color, out tempNode);
     }
     public void ClearNode()
     {
@@ -461,7 +474,7 @@ public class GameManager : MonoBehaviour
         {
             for(int j = 0; j < 8; j++)
             {
-                map[i, j].gameObject.SetActive(false);
+                map[i, j].RevertNode();
             }
         }
     }

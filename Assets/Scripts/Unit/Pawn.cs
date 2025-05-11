@@ -44,14 +44,14 @@ public class Pawn : Unit
         //Enpassant
         if (currentPos.x != 7
             && unitManager.map[currentPos.x + 1, currentPos.y].currentUnit != null
-            && unitManager.map[currentPos.x + 1, currentPos.y].currentUnit.unitType.ToString().Contains("Pawn")
+            && unitManager.map[currentPos.x + 1, currentPos.y].currentUnit is Pawn
             && ((Pawn)unitManager.map[currentPos.x + 1, currentPos.y].currentUnit).canEnpassant)
         {
             movableNodes.Add(unitManager.map[currentPos.x + 1, currentPos.y + 1 * moveDir]);
         }
         if (currentPos.x != 0
             && unitManager.map[currentPos.x - 1, currentPos.y].currentUnit != null
-            && unitManager.map[currentPos.x - 1, currentPos.y].currentUnit.unitType.ToString().Contains("Pawn")
+            && unitManager.map[currentPos.x - 1, currentPos.y].currentUnit is Pawn
             && ((Pawn)unitManager.map[currentPos.x - 1, currentPos.y].currentUnit).canEnpassant)
         {
             movableNodes.Add(unitManager.map[currentPos.x - 1, currentPos.y + 1 * moveDir]);
@@ -92,6 +92,7 @@ public class Pawn : Unit
             unitManager.map[pos.x, pos.y].currentUnit = this;
 
             SetPromotionObj();
+            audioSource.Play();
         }
         else
         {

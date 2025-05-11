@@ -35,7 +35,6 @@ public class Queen : Unit
             if (pos.IsOverBoard()) { break; }
             if (unitManager.map[pos.x, pos.y].currentUnit != null)
             {
-                Debug.Log(unitManager.map[pos.x, pos.y].gameObject.name);
                 if (unitManager.map[pos.x, pos.y].currentUnit.unitColor != unitColor)
                 {
                     movableNodes.Add(unitManager.map[pos.x, pos.y]);
